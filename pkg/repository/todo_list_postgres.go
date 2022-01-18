@@ -53,7 +53,7 @@ func (r *TodoListLite) GetAllLists(userId int) ([]todoServer.TodoList, error) {
 }
 
 func (r *TodoListLite) DeleteList(listId int, userId int) error {
-	query := fmt.Sprintf("DELETE FROM %s tl INNER JOIN %s ul ON tl.id = ul.list_id WHERE ul.list_id = $1 AND ul.user_id = $2", todoListsTable, usersListsTable) //don't work
+	query := fmt.Sprintf("DELETE FROM %s tl USING %s ul WHERE tl.id = ul.list_id AND ul.list_id = $1 AND ul.user_id = $2", todoListsTable, usersListsTable) //don't work
 	_, err := r.db.Exec(query, listId, userId)
 	return err
 }
@@ -77,6 +77,8 @@ func (r *TodoListLite) UpdateList(listId, userId int, input todoServer.UpdateLis
 	setQuery := strings.Join(setValues, ", ")
 	query := fmt.Sprintf("UPDATE %s tl SET %s FROM %s ul WHERE tl.id = ul.list_id AND ul.list_id = $%d AND ul.user_id = $%d",
 		todoListsTable, setQuery, usersListsTable, argId, argId+1)
+
+	args = append(args, listId, userId)
 
 	logrus.Debugf("updateQuery: %s", query)
 	logrus.Debugf("args: %s", args)

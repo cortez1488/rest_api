@@ -5,9 +5,11 @@ import (
 	handler "github.com/cortez1488/rest_todo/pkg/handler"
 	"github.com/cortez1488/rest_todo/pkg/repository"
 	service "github.com/cortez1488/rest_todo/pkg/service"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"os"
 )
 
 func main() {
@@ -16,7 +18,19 @@ func main() {
 		logrus.Fatalf("error init configs %s", err.Error())
 	}
 
-	db, err := repository.NewSqliteDb()
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("error loading .env configs %s", err.Error())
+	}
+
+	db, err := repository.NewPostgresDb(repository.Config{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
+	})
+
 	if err != nil {
 		logrus.Fatalf("error with get new database %s", err.Error())
 	}
