@@ -29,3 +29,7 @@ func (s *ItemService) GetItems(userId, listId int) ([]todoServer.TodoItem, error
 	}
 	return s.repo.GetItems(listId)
 }
+
+func (s *ItemService) GetById(userId, itemId int) (todoServer.TodoItem, error) {
+	return s.repo.GetById(userId, itemId)
+}

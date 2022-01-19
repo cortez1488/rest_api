@@ -47,3 +47,14 @@ func (r *todoItemPostgres) GetItems(listId int) ([]todoServer.TodoItem, error) {
 	}
 	return items, err
 }
+
+func (r *todoItemPostgres) GetById(userId, itemId int) (todoServer.TodoItem, error) {
+	query := fmt.Sprintf("SELECT i.id, i.title, i.description, i.done FROM %s i JOIN %s li ON i.id = li.item_id JOIN %s ul ON ul.list_id = li.list_id WHERE i.id = $1 AND ul.user_id = $2 LIMIT 1",
+		todoItemsTable, listsItemsTable, usersListsTable)
+	var result todoServer.TodoItem
+	if err := r.db.Get(&result, query, itemId, userId); err != nil {
+		return todoServer.TodoItem{}, err
+	}
+
+	return result, nil
+}
