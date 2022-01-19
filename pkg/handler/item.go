@@ -103,5 +103,20 @@ func (h *Handler) updateItem(c *gin.Context) {
 }
 
 func (h *Handler) deleteItem(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
 
+	itemId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	err = h.services.DeleteItem(itemId, userId) //мб указатель?
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusNoContent, responseStatus{Status: "deleted"})
 }

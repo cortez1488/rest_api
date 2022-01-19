@@ -97,3 +97,9 @@ func (r *todoItemPostgres) UpdateItem(itemId, userId int, input todoServer.Updat
 	return err
 
 }
+
+func (r *todoItemPostgres) DeleteItem(itemId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", todoItemsTable)
+	_, err := r.db.Exec(query, itemId)
+	return err
+}

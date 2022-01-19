@@ -40,3 +40,11 @@ func (s *ItemService) UpdateItem(itemId, userId int, input todoServer.UpdateItem
 	}
 	return s.repo.UpdateItem(itemId, userId, input)
 }
+
+func (s *ItemService) DeleteItem(itemId, userId int) error {
+	_, err := s.repo.GetById(userId, itemId)
+	if err != nil {
+		return errors.New("does not exist or no access")
+	}
+	return s.repo.DeleteItem(itemId)
+}
