@@ -33,3 +33,10 @@ func (s *ItemService) GetItems(userId, listId int) ([]todoServer.TodoItem, error
 func (s *ItemService) GetById(userId, itemId int) (todoServer.TodoItem, error) {
 	return s.repo.GetById(userId, itemId)
 }
+
+func (s *ItemService) UpdateItem(itemId, userId int, input todoServer.UpdateItemInput) error {
+	if err := input.Validate(); err != nil {
+		return err
+	}
+	return s.repo.UpdateItem(itemId, userId, input)
+}

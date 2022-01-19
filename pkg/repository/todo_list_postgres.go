@@ -84,8 +84,5 @@ func (r *TodoListLite) UpdateList(listId, userId int, input todoServer.UpdateLis
 	logrus.Debugf("args: %s", args)
 
 	_, err := r.db.Exec(query, args...)
-	if err != nil {
-
-	}
 	return err
 }

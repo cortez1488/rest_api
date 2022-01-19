@@ -4,6 +4,8 @@ import (
 	"fmt"
 	todoServer "github.com/cortez1488/rest_todo"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
+	"strings"
 )
 
 type todoItemPostgres struct {
@@ -57,4 +59,41 @@ func (r *todoItemPostgres) GetById(userId, itemId int) (todoServer.TodoItem, err
 	}
 
 	return result, nil
+}
+
+func (r *todoItemPostgres) UpdateItem(itemId, userId int, input todoServer.UpdateItemInput) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+	if input.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title = $%d", argId))
+		args = append(args, *input.Title)
+		argId++
+	}
+
+	if input.Description != nil {
+		setValues = append(setValues, fmt.Sprintf("description = $%d", argId))
+		args = append(args, *input.Description)
+		argId++
+	}
+	if input.Done != nil {
+		setValues = append(setValues, fmt.Sprintf("done = $%d", argId))
+		args = append(args, *input.Done)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE %s i SET %s FROM %s li,  %s ul WHERE i.id = li.item_id AND ul.list_id = li.list_id AND i.id = $%d AND ul.user_id = $%d",
+		todoItemsTable, setQuery, listsItemsTable, usersListsTable, argId, argId+1)
+
+	args = append(args, itemId, userId)
+
+	fmt.Printf("updateQuery: %s \n", query)
+	fmt.Printf("args: %s \n", args)
+	logrus.Debugf("updateQuery: %s", query)
+	logrus.Debugf("args: %s", args)
+
+	_, err := r.db.Exec(query, args...)
+	return err
+
 }

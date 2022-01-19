@@ -22,6 +22,7 @@ type TodoItem interface {
 	CreateItem(userId, listId int, input todoServer.TodoItem) (int, error)
 	GetItems(userId, listId int) ([]todoServer.TodoItem, error)
 	GetById(userId, itemId int) (todoServer.TodoItem, error)
+	UpdateItem(itemId, userId int, input todoServer.UpdateItemInput) error
 }
 type Service struct {
 	Authorization
